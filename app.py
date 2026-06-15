@@ -5,7 +5,8 @@ import redis
 app = FastAPI()
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"Hello": "World",
+            "pod": os.environ.get("HOSTNAME")}
 
 @app.get("/users")
 def get_users():
