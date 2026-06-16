@@ -17,3 +17,20 @@ def get_users():
             {"id": 3, "name": "Charlie"}
         ]
     }
+
+@app.get("/config")
+def get_config():
+    return {
+        "APP_NAME": os.environ.get("APP_NAME"),
+        "APP_ENV": os.environ.get("APP_ENV")
+    }
+
+@app.get("/books")
+def get_books():
+    return {
+        "books": [
+            {"id": 1, "title": "The Great Gatsby", "author": "F. Scott Fitzgerald"},
+            {"id": 2, "title": "To Kill a Mockingbird", "author": "Harper Lee"},
+            {"id": 3, "title": "1984", "author": "George Orwell"}
+        ]
+    }
