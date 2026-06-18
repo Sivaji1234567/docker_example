@@ -19,8 +19,8 @@ spec:
     spec:
       containers:
       - name: fastapi
-        image: fastapi:v4
-        imagePullPolicy: Never
+        image: sivajiangudu123/docker_demo:v1
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8000
         env:
