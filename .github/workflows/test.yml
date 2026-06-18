@@ -1,14 +1,11 @@
-name: Install Dependencies
+steps:
+  - uses: actions/checkout@v4
 
-on:
-  push
+  - name: Show Files
+    run: ls -la
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
+  - name: Check Python
+    run: python --version
 
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Packages
-        run: pip install -r requirements.txt
+  - name: Install Dependencies
+    run: pip install -r requirements.txt
