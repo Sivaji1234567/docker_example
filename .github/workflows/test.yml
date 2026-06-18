@@ -1,4 +1,4 @@
-name: My First Action
+name: Hello
 
 on:
   push
@@ -8,5 +8,4 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print Message
-        run: echo "Hello Siva"
+      - run: echo "Hello from GitHub Actions"
