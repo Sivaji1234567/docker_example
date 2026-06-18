@@ -1,4 +1,4 @@
-name: Python Check
+name: Install Dependencies
 
 on:
   push
@@ -10,5 +10,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check Python
-        run: python --version
+      - name: Install Packages
+        run: pip install -r requirements.txt
