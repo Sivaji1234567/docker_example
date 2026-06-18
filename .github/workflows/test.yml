@@ -1,14 +1,14 @@
-name: Hello
+name: Python Check
 
 on:
   push
 
 jobs:
-  hello:
+  test:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Show Files
-        run: ls -la
+      - name: Check Python
+        run: python --version
