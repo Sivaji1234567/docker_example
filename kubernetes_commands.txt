@@ -710,18 +710,3 @@ Cluster:
 Amazon EKS
 
 ---
-
-# Topics Remaining to Become Production Ready
-
-1. Resource Requests & Limits
-2. Liveness Probes
-3. Readiness Probes
-4. Rolling Updates
-5. Horizontal Pod Autoscaler (HPA)
-6. Helm
-7. CI/CD Pipelines
-8. AWS EKS
-9. Monitoring (Prometheus/Grafana)
-10. Logging (ELK/Loki)
-
-After mastering these topics, you will be capable of deploying and managing FastAPI, Django, or React applications on AWS EKS in production.
