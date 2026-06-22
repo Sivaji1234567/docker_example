@@ -1,0 +1,46 @@
+stages:
+
+* test
+* build
+* push
+
+variables:
+IMAGE_NAME: sivajiangudu123/docker_demo
+
+test:
+stage: test
+image: python:3.12
+
+before_script:
+- pip install -r requirements.txt
+
+script:
+- python --version
+- echo "Running tests..."
+
+build:
+stage: build
+image: docker:24
+
+services:
+- docker:24-dind
+
+script:
+- docker build -t $IMAGE_NAME:$CI_COMMIT_SHA .
+
+push:
+stage: push
+image: docker:24
+
+services:
+- docker:24-dind
+
+before_script:
+- docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+script:
+- docker build -t $IMAGE_NAME:$CI_COMMIT_SHA .
+- docker push $IMAGE_NAME:$CI_COMMIT_SHA
+
+only:
+- main
