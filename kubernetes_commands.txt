@@ -1,0 +1,712 @@
+kubectl apply -f deployment.yaml   ---to apply the file to run
+kind load docker-image fastapi:v2  ---to load the image into kind cluster
+
+Phase 4: Kind
+
+You didn't want AWS costs yet.
+
+So we installed Kind.
+
+Kind means:
+
+Kubernetes IN Docker
+
+Architecture:
+
+Windows
+    ↓
+WSL Ubuntu
+    ↓
+Docker
+    ↓
+Kind
+    ↓
+Kubernetes Cluster
+
+You created:
+
+kind create cluster
+
+Verified:
+
+kubectl get nodes
+
+Output:
+
+kind-control-plane
+
+This was your first Kubernetes cluster.
+
+Phase 5: kubectl
+
+Installed:
+
+kubectl
+
+Verified:
+
+kubectl version --client
+
+You learned:
+
+kubectl get nodes
+kubectl get pods
+kubectl get deployments
+kubectl get svc
+Phase 6: Deploy FastAPI
+
+You already had:
+
+fastapi:v1
+
+Docker image.
+
+Loaded it into Kind:
+
+kind load docker-image fastapi:v1
+
+Created:
+
+deployment.yaml
+kind: Deployment
+
+Applied:
+
+kubectl apply -f deployment.yaml
+
+Result:
+
+Deployment
+      ↓
+ReplicaSet
+      ↓
+Pod
+      ↓
+Container
+Phase 7: Service
+
+Pods are private.
+
+So we created:
+
+kind: Service
+
+Applied:
+
+kubectl apply -f service.yaml
+
+Architecture:
+
+Browser
+    ↓
+Service
+    ↓
+Pods
+Phase 8: Port Forward
+
+Access application:
+
+kubectl port-forward service/fastapi-service 8000:80
+
+Then:
+
+http://localhost:8000
+
+worked.
+
+You learned:
+
+Port Forward
+    ≠
+Production Access
+
+It's just a temporary tunnel.
+
+Phase 9: Self-Healing
+
+You learned:
+
+Deployment says:
+
+replicas: 2
+
+Kubernetes constantly checks:
+
+Desired = 2
+Actual = 2
+
+Delete a pod:
+
+kubectl delete pod <pod>
+
+Kubernetes notices:
+
+Desired = 2
+Actual = 1
+
+Creates a new pod.
+
+This is:
+
+Self-Healing
+Phase 10: Scaling
+
+Scale manually:
+
+kubectl scale deployment fastapi --replicas=8
+
+Kubernetes created:
+
+Pod1
+Pod2
+Pod3
+...
+Pod8
+
+You learned:
+
+One application
+      ↓
+Many pod instances
+
+
+kubectl rollout restart deployment fastapi   ---to restart the deployment
+
+
+
+# Kubernetes Quick Revision Guide
+
+## Why Kubernetes?
+
+Docker can run containers on a single machine.
+
+Problem:
+
+* If the machine crashes, the application goes down.
+* Scaling containers manually is difficult.
+* Managing hundreds of containers becomes complex.
+
+Kubernetes solves:
+
+* Auto-healing
+* Auto-scaling
+* Load balancing
+* Rolling deployments
+* High availability
+
+---
+
+# Kubernetes Architecture
+
+## Control Plane Components
+
+### API Server
+
+The entry point to Kubernetes.
+
+When you run:
+
+kubectl apply -f deployment.yaml
+
+the request goes to the API Server.
+
+Responsibilities:
+
+* Receives all requests
+* Validates requests
+* Stores cluster state in etcd
+
+---
+
+### etcd
+
+The database of Kubernetes.
+
+Stores:
+
+* Deployments
+* Pods
+* Services
+* ConfigMaps
+* Secrets
+* Replica counts
+* Entire cluster state
+
+Think:
+
+etcd = Brain Memory of Kubernetes
+
+---
+
+### Controller Manager
+
+Responsible for maintaining the desired state.
+
+Example:
+
+Deployment:
+
+replicas: 3
+
+Current Pods:
+
+2
+
+Controller Manager notices:
+
+Desired = 3
+Current = 2
+
+Creates one more Pod.
+
+Think:
+
+Controller Manager = "Make reality match the configuration"
+
+---
+
+### Scheduler
+
+Assigns Pods to Nodes.
+
+Example:
+
+Node-1:
+CPU 80%
+Memory 70%
+
+Node-2:
+CPU 10%
+Memory 20%
+
+Scheduler places the Pod on Node-2.
+
+If no Node has sufficient resources:
+
+Pod Status = Pending
+
+Think:
+
+Scheduler = "Choose the best machine"
+
+---
+
+# Worker Node Components
+
+## Kubelet
+
+Agent running on every Node.
+
+Responsibilities:
+
+* Receives Pod assignments
+* Starts containers
+* Monitors containers
+* Reports status back to API Server
+
+Think:
+
+Kubelet = Worker of the Node
+
+---
+
+## Container Runtime
+
+Runs containers.
+
+Examples:
+
+* containerd
+* Docker
+* CRI-O
+
+Responsibilities:
+
+* Pull images
+* Start containers
+* Stop containers
+
+---
+
+# Core Kubernetes Objects
+
+## Pod
+
+Smallest deployable unit.
+
+A Pod contains:
+
+* One or more containers
+* Shared network
+* Shared storage
+
+Example:
+
+FastAPI Container
+
+inside
+
+FastAPI Pod
+
+---
+
+## Deployment
+
+Manages Pods.
+
+Features:
+
+* Scaling
+* Self-healing
+* Rolling updates
+
+Example:
+
+replicas: 3
+
+Deployment ensures 3 Pods always exist.
+
+---
+
+## Service
+
+Provides a stable endpoint for Pods.
+
+Problem:
+
+Pods get new IPs after recreation.
+
+Solution:
+
+Service provides a fixed address.
+
+Example:
+
+fastapi-service
+
+Traffic:
+
+User
+↓
+Service
+↓
+Pods
+
+Service also load balances requests.
+
+---
+
+# Self Healing
+
+Delete a Pod:
+
+kubectl delete pod pod-name
+
+Result:
+
+Controller Manager notices:
+
+Desired = 3
+Current = 2
+
+Creates a new Pod automatically.
+
+---
+
+# Scaling
+
+Scale Pods:
+
+kubectl scale deployment fastapi --replicas=8
+
+Result:
+
+Kubernetes creates 8 Pods.
+
+---
+
+# ConfigMap
+
+Stores non-sensitive configuration.
+
+Examples:
+
+* APP_NAME
+* APP_ENV
+* URLs
+* Feature flags
+
+Example:
+
+APP_NAME=FastAPI Demo
+APP_ENV=production
+
+Benefits:
+
+* Change configuration without rebuilding images
+* Separate config from code
+
+---
+
+# Secret
+
+Stores sensitive information.
+
+Examples:
+
+* Database Password
+* API Keys
+* JWT Secret
+* AWS Credentials
+
+Never hardcode secrets in code.
+
+---
+
+# Volumes
+
+Provide persistent storage.
+
+Without Volume:
+
+Pod Deleted
+↓
+Data Lost
+
+With Volume:
+
+Pod Deleted
+↓
+Data Preserved
+
+In production:
+
+Usually databases are external:
+
+* AWS RDS
+* Azure SQL
+* PostgreSQL Managed Services
+
+---
+
+# Namespaces
+
+Used to separate environments.
+
+Examples:
+
+default
+dev
+qa
+staging
+prod
+
+Commands:
+
+kubectl get pods -n dev
+
+kubectl get pods -n prod
+
+Benefits:
+
+* Isolation
+* Organization
+* Environment separation
+
+---
+
+# Ingress
+
+Defines routing rules.
+
+Example:
+
+api.company.com
+↓
+fastapi-service
+
+admin.company.com
+↓
+admin-service
+
+Think:
+
+Ingress = Notice Board containing routing instructions
+
+---
+
+# Ingress Controller
+
+Software that reads Ingress rules and performs routing.
+
+Examples:
+
+* NGINX Ingress Controller
+* Traefik
+* AWS Load Balancer Controller
+
+Think:
+
+Ingress = Rules
+
+Ingress Controller = Executes the rules
+
+Real-Life Example:
+
+Notice Board:
+Room 1 → Physics
+Room 2 → Chemistry
+
+This is Ingress.
+
+Staff directing students to rooms.
+
+This is Ingress Controller.
+
+---
+
+# Complete Request Flow
+
+User
+↓
+Ingress
+↓
+Ingress Controller
+↓
+Service
+↓
+Pod
+↓
+Container
+
+---
+
+# Complete Deployment Flow
+
+kubectl apply
+↓
+API Server
+↓
+etcd
+
+Controller Manager
+↓
+Creates Pods
+
+Scheduler
+↓
+Assigns Nodes
+
+Kubelet
+↓
+Starts Containers
+
+Container Runtime
+↓
+Runs Application
+
+---
+
+# Important Commands
+
+## Cluster
+
+kubectl cluster-info
+
+kubectl get nodes
+
+kubectl describe node node-name
+
+---
+
+## Pods
+
+kubectl get pods
+
+kubectl get pods -o wide
+
+kubectl describe pod pod-name
+
+kubectl logs pod-name
+
+kubectl delete pod pod-name
+
+kubectl exec -it pod-name -- sh
+
+---
+
+## Deployments
+
+kubectl get deployments
+
+kubectl describe deployment deployment-name
+
+kubectl scale deployment fastapi --replicas=5
+
+kubectl rollout restart deployment fastapi
+
+---
+
+## Services
+
+kubectl get svc
+
+kubectl describe svc fastapi-service
+
+---
+
+## ConfigMaps
+
+kubectl get configmaps
+
+kubectl describe configmap fastapi-config
+
+---
+
+## Secrets
+
+kubectl get secrets
+
+kubectl describe secret db-secret
+
+---
+
+## Namespaces
+
+kubectl get namespaces
+
+kubectl get pods -n dev
+
+kubectl get pods -n prod
+
+---
+
+# AWS Production Architecture
+
+Internet
+↓
+AWS Application Load Balancer
+↓
+AWS Load Balancer Controller
+↓
+Ingress
+↓
+Service
+↓
+Pods
+↓
+Application
+
+Database:
+AWS RDS PostgreSQL
+
+Secrets:
+AWS Secrets Manager or Kubernetes Secrets
+
+Container Images:
+Amazon ECR
+
+Cluster:
+Amazon EKS
+
+---

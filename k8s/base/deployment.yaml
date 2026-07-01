@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: fastapi
+
+spec:
+  replicas: 10
+
+  selector:
+    matchLabels:
+      app: fastapi
+
+  template:
+    metadata:
+      labels:
+        app: fastapi
+
+    spec:
+      containers:
+      - name: fastapi
+        image: sivajiangudu123/docker_demo:v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        env:
+        - name: APP_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: fastapi-config
+              key: APP_NAME
+
+        - name: APP_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: fastapi-config
+              key: APP_ENV
