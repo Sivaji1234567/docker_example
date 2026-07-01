@@ -22,8 +22,8 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t sivajiangudu123/docker_demo:latest .
+          docker build -t sivajiangudu123/docker_demo:${{ github.sha }} .
 
       - name: Push Docker Image
         run: |
-          docker push sivajiangudu123/docker_demo:latest
+          docker push sivajiangudu123/docker_demo:${{ github.sha }}
